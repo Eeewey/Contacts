@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerAdapter(
-    private val list: List<String>, private val onItemClick: (id: Int) -> Unit
+    private val list: List<ContData>, private val onItemClick: (id: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val itemView = LayoutInflater.from(parent.context)
@@ -17,7 +17,7 @@ class RecyclerAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = list[position]
+        holder.textView.text = list[position].name_data + " " + list[position].lastName_data
 
         holder.buttonInfo.setOnClickListener {
             onItemClick(holder.adapterPosition)
