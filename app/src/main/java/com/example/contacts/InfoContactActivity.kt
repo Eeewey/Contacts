@@ -1,5 +1,6 @@
 package com.example.contacts
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -16,10 +17,10 @@ class InfoContactActivity : AppCompatActivity() {
     lateinit var NumberText : TextView
 
     lateinit var RefactorButton : Button
-    lateinit var DelteButton : Button
+    lateinit var DeleteButton : Button
 
     companion object {
-        const val RESULT_KEY = "RESULT_KEY"
+        const val DELETE = "DELETE"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,14 +33,26 @@ class InfoContactActivity : AppCompatActivity() {
         NumberText = findViewById(R.id.Number)
 
         RefactorButton = findViewById(R.id.RedactButton)
-        DelteButton = findViewById(R.id.DeleteButton)
+        DeleteButton = findViewById(R.id.DeleteButton)
 
         val itemTextName = intent.getStringExtra(MainActivity.ITEM_KEY_NAME)
         val itemTextLastName = intent.getStringExtra(MainActivity.ITEM_KEY_LASTNAME)
+        val itemTextDate = intent.getStringExtra(MainActivity.ITEM_KEY_DATE)
+        val itemTextNumber = intent.getStringExtra(MainActivity.ITEM_KEY_NUMBER)
 
         id = intent.getIntExtra(MainActivity.ITEM_ID_KEY, 0)
 
         NameText.text = itemTextName
         LastText.text = itemTextLastName
+        DateText.text = itemTextDate
+        NumberText.text = itemTextNumber
+
+        DeleteButton.setOnClickListener{
+            var returnIntent = Intent()
+            returnIntent.putExtra(MainActivity.ITEM_ID_KEY, id)
+            returnIntent.putExtra(DELETE, true)
+            setResult(Activity.RESULT_OK, returnIntent)
+            finish()
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.contacts
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity() {
         const val REQUEST_CODE = 1
         const val ITEM_KEY_NAME = "ITEM_KEY_NAME"
         const val ITEM_KEY_LASTNAME = "ITEM_KEY_LASTNAME"
+        const val ITEM_KEY_DATE = "ITEM_KEY_DATE"
+        const val ITEM_KEY_NUMBER = "ITEM_KEY_NUMBER"
         const val ITEM_ID_KEY = "ITEM_ID_KEY"
     }
 
@@ -48,11 +51,13 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, InfoContactActivity::class.java)
             intent.putExtra(ITEM_KEY_NAME, ContList.get(it).name)
             intent.putExtra(ITEM_KEY_LASTNAME, ContList.get(it).lastName)
+            intent.putExtra(ITEM_KEY_DATE, ContList.get(it).dateOfBirth)
+            intent.putExtra(ITEM_KEY_NUMBER, ContList.get(it).number)
             intent.putExtra(ITEM_ID_KEY, it)
             startActivityForResult(intent, REQUEST_CODE)
         }
 
-        AddToCont("Вася","ааа", "0124241", "9124124111")
+        //AddToCont("Вася","ааа", "0124241", "9124124111")
 
         val recyclerView = findViewById<RecyclerView>(R.id.ViewOfContacts)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -70,5 +75,22 @@ class MainActivity : AppCompatActivity() {
 
         ContList.add(todoEntity)
         adapter.notifyItemInserted(ContList.lastIndex)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode : Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+
+            val id = data!!.getIntExtra(ITEM_ID_KEY, 0)
+            val isDelete = data!!.getBooleanExtra(InfoContactActivity.DELETE, false)
+
+            if(isDelete){
+                ContList.removeAt(id)
+                adapter.notifyItemRemoved(id)
+
+                todoDao.delete(ContList[id])
+            }
+        }
     }
 }
