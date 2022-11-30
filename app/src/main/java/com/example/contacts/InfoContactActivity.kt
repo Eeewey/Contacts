@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 
+
 class InfoContactActivity : AppCompatActivity() {
 
     var id = 0
@@ -23,6 +24,10 @@ class InfoContactActivity : AppCompatActivity() {
         const val DELETE = "DELETE"
     }
 
+    private val dao by lazy {
+        TodoDatabase.getDatabase(applicationContext).todoDao()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.info_contact)
@@ -35,17 +40,13 @@ class InfoContactActivity : AppCompatActivity() {
         RefactorButton = findViewById(R.id.RedactButton)
         DeleteButton = findViewById(R.id.DeleteButton)
 
-        val itemTextName = intent.getStringExtra(MainActivity.ITEM_KEY_NAME)
-        val itemTextLastName = intent.getStringExtra(MainActivity.ITEM_KEY_LASTNAME)
-        val itemTextDate = intent.getStringExtra(MainActivity.ITEM_KEY_DATE)
-        val itemTextNumber = intent.getStringExtra(MainActivity.ITEM_KEY_NUMBER)
-
         id = intent.getIntExtra(MainActivity.ITEM_ID_KEY, 0)
+        val entity = dao.getById(id.toLong())
 
-        NameText.text = itemTextName
-        LastText.text = itemTextLastName
-        DateText.text = itemTextDate
-        NumberText.text = itemTextNumber
+        NameText.text = entity.name
+        LastText.text = entity.lastName
+        NumberText.text = entity.number
+        DateText.text = entity.dateOfBirth
 
         DeleteButton.setOnClickListener{
             var returnIntent = Intent()
@@ -53,6 +54,13 @@ class InfoContactActivity : AppCompatActivity() {
             returnIntent.putExtra(DELETE, true)
             setResult(Activity.RESULT_OK, returnIntent)
             finish()
+        }
+
+        RefactorButton.setOnClickListener{
+            var intent = Intent(this, EditActivity::class.java)
+
+            intent.putExtra(MainActivity.ITEM_ID_KEY, id)
+            startActivity(intent)
         }
     }
 }
