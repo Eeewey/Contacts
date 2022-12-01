@@ -43,11 +43,11 @@ class InfoContactActivity : AppCompatActivity() {
 
         id = intent.getLongExtra(MainActivity.ITEM_ID_KEY, 0)
         val entity = dao.getById(id)
-        println(entity)
-        NameText.text = entity?.name
-        LastText.text = entity?.lastName
-//        NumberText.text = entity?.number
-//        DateText.text = entity?.dateOfBirth
+
+        NameText.text = entity.name
+        LastText.text = entity.lastName
+        NumberText.text = entity.number
+        DateText.text = entity.dateOfBirth
 
         DeleteButton.setOnClickListener{
             var returnIntent = Intent()

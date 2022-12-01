@@ -32,8 +32,8 @@ class EditActivity : AppCompatActivity() {
 
         NameText = findViewById(R.id.NameEdit)
         LastText = findViewById(R.id.LastNameEdit)
-        DateText = findViewById(R.id.InfoDateBorn)
-        NumberText = findViewById(R.id.)
+//        DateText = findViewById(R.id.InfoDateBorn)
+//        NumberText = findViewById(R.id.)
 
         CancelButton = findViewById(R.id.Cancelbutton)
         SaveButton = findViewById(R.id.Savebutton)
@@ -41,10 +41,10 @@ class EditActivity : AppCompatActivity() {
         id = intent.getLongExtra(MainActivity.ITEM_ID_KEY, 0L)
         val entity = dao.getById(id)
 
-        //NameText.setText(TodoDatabase.getDatabase(this).todoDao().getById(id.toLong()).name)
-        //LastText.setText(TodoDatabase.getDatabase(this).todoDao().getById(id.toLong()).lastName)
-        /*DateText.setText(itemTextDate)
-        NumberText.setText(itemTextNumber)*/
+        NameText.setText(entity.name)
+        LastText.setText(entity.lastName)
+//        DateText.setText(itemTextDate)
+//        NumberText.setText(itemTextNumber)
 
 
         CancelButton.setOnClickListener {

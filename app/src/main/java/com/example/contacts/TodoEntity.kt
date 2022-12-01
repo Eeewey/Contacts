@@ -12,4 +12,6 @@ class TodoEntity {
     var lastName: String = ""
     var dateOfBirth = ""
     var number = ""
+
+    var IsActive = 1
 }

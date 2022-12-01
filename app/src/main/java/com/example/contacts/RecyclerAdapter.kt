@@ -24,6 +24,10 @@ class RecyclerAdapter(
         }
     }
 
+    fun SetVisible(holder: ViewHolder, position: Int){
+        holder.textView.visibility = View.GONE
+    }
+
     override fun getItemCount(): Int {
         return list.size
     }
