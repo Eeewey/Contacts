@@ -1,17 +1,17 @@
 package com.example.contacts
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 
 
 class InfoContactActivity : AppCompatActivity() {
 
-    var id = 0
+    var id = 0L
     lateinit var NameText : TextView
     lateinit var LastText : TextView
     lateinit var DateText : TextView
@@ -25,28 +25,29 @@ class InfoContactActivity : AppCompatActivity() {
     }
 
     private val dao by lazy {
-        TodoDatabase.getDatabase(applicationContext).todoDao()
+        TodoDatabase.getDatabase(this).todoDao()
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.info_contact)
 
-        NameText = findViewById(R.id.Name)
-        LastText = findViewById(R.id.LastName)
-        DateText = findViewById(R.id.DateOfBirth)
-        NumberText = findViewById(R.id.Number)
+        NameText = findViewById(R.id.InfoName)
+        LastText = findViewById(R.id.InfoSurname)
+        DateText = findViewById(R.id.InfoDateBorn)
+        NumberText = findViewById(R.id.InfoNumber)
 
         RefactorButton = findViewById(R.id.RedactButton)
         DeleteButton = findViewById(R.id.DeleteButton)
 
-        id = intent.getIntExtra(MainActivity.ITEM_ID_KEY, 0)
-        val entity = dao.getById(id.toLong())
-
-        NameText.text = entity.name
-        LastText.text = entity.lastName
-        NumberText.text = entity.number
-        DateText.text = entity.dateOfBirth
+        id = intent.getLongExtra(MainActivity.ITEM_ID_KEY, 0)
+        val entity = dao.getById(id)
+        println(entity)
+        NameText.text = entity?.name
+        LastText.text = entity?.lastName
+//        NumberText.text = entity?.number
+//        DateText.text = entity?.dateOfBirth
 
         DeleteButton.setOnClickListener{
             var returnIntent = Intent()

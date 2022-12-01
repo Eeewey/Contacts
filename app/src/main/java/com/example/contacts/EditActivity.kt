@@ -1,17 +1,15 @@
 package com.example.contacts
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 
 
 class EditActivity : AppCompatActivity() {
 
-    var id = 0
+    var id = 0L
     lateinit var NameText: EditText
     lateinit var LastText: EditText
     lateinit var DateText: EditText
@@ -24,19 +22,24 @@ class EditActivity : AppCompatActivity() {
         const val EDIT = "EDIT"
     }
 
+    private val dao by lazy {
+        TodoDatabase.getDatabase(this).todoDao()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.edit_activity)
 
         NameText = findViewById(R.id.NameEdit)
         LastText = findViewById(R.id.LastNameEdit)
-        /*DateText = findViewById(R.id.DateEdit)
-        NumberText = findViewById(R.id.NumberEdit)*/
+        DateText = findViewById(R.id.InfoDateBorn)
+        NumberText = findViewById(R.id.)
 
         CancelButton = findViewById(R.id.Cancelbutton)
         SaveButton = findViewById(R.id.Savebutton)
 
-        id = intent.getIntExtra(MainActivity.ITEM_ID_KEY, 0)
+        id = intent.getLongExtra(MainActivity.ITEM_ID_KEY, 0L)
+        val entity = dao.getById(id)
 
         //NameText.setText(TodoDatabase.getDatabase(this).todoDao().getById(id.toLong()).name)
         //LastText.setText(TodoDatabase.getDatabase(this).todoDao().getById(id.toLong()).lastName)
@@ -49,9 +52,14 @@ class EditActivity : AppCompatActivity() {
         }
 
         SaveButton.setOnClickListener {
+            println(entity)
+            entity.name = NameText.text.toString()
+            entity.lastName = LastText.text.toString()
+            println(entity)
+            dao.update(entity)
             var intent = Intent(this, MainActivity::class.java)
-
-            finish()
+            intent.putExtra(MainActivity.ITEM_ID_KEY, id)
+            startActivity(intent)
         }
     }
 }

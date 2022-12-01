@@ -18,4 +18,5 @@ interface TodoDao {
 
     @Delete
     fun delete(todo: TodoEntity)
+
 }
