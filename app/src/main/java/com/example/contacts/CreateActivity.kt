@@ -1,6 +1,5 @@
 package com.example.contacts
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -23,7 +22,7 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private val dao by lazy {
-        TodoDatabase.getDatabase(this).todoDao()
+        ContDb.getDatabase(this).todoDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +33,7 @@ class CreateActivity : AppCompatActivity() {
         EditSurname = findViewById(R.id.EditSurnameCreate)
         EditNumber = findViewById(R.id.InfoNumber)
         EditDateBorn = findViewById(R.id.EditDateBornCreate)
+
         ButtonCreate = findViewById(R.id.Create_contact)
         ButtonCancel = findViewById(R.id.Cancel_create)
 
@@ -43,14 +43,17 @@ class CreateActivity : AppCompatActivity() {
         var intent = Intent(this, MainActivity::class.java)
 
         ButtonCreate.setOnClickListener {
-            entity.name = EditName.text.toString()
-            entity.lastName = EditSurname.text.toString()
-            entity.number = EditNumber.text.toString()
-            entity.dateOfBirth = EditDateBorn.text.toString()
-            dao.update(entity)
+            if(EditName.text.toString() != "" && EditSurname.text.toString() != "" &&
+                EditNumber.text.toString() != "" && EditDateBorn.text.toString() != ""){
+                entity.name = EditName.text.toString()
+                entity.lastName = EditSurname.text.toString()
+                entity.number = EditNumber.text.toString()
+                entity.dateOfBirth = EditDateBorn.text.toString()
+                dao.update(entity)
 
-            intent.putExtra(MainActivity.ITEM_ID_KEY, id)
-            startActivity(intent)
+                intent.putExtra(MainActivity.ITEM_ID_KEY, id)
+                startActivity(intent)
+            }
         }
 
         ButtonCancel.setOnClickListener{
@@ -59,8 +62,13 @@ class CreateActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
-
-
     }
 
+    override fun onBackPressed() {
+        intent.putExtra(MainActivity.ITEM_ID_KEY, id)
+        intent.putExtra(CANCEL, true)
+        setResult(Activity.RESULT_OK, intent)
+
+        super.onBackPressed()
+    }
 }

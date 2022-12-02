@@ -20,15 +20,11 @@ class InfoContactActivity : AppCompatActivity() {
     lateinit var RefactorButton : Button
     lateinit var DeleteButton : Button
 
-    companion object {
-        const val DELETE = "DELETE"
-    }
 
     private val dao by lazy {
-        TodoDatabase.getDatabase(this).todoDao()
+        ContDb.getDatabase(this).todoDao()
     }
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.info_contact)
@@ -52,7 +48,6 @@ class InfoContactActivity : AppCompatActivity() {
         DeleteButton.setOnClickListener{
             var returnIntent = Intent()
             returnIntent.putExtra(MainActivity.ITEM_ID_KEY, id)
-            returnIntent.putExtra(DELETE, true)
             setResult(Activity.RESULT_OK, returnIntent)
             finish()
         }

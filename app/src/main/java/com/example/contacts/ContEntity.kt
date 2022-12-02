@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "todos")
-class TodoEntity {
+@Entity(tableName = "conts")
+class ContEntity {
     @PrimaryKey(autoGenerate = true)
     var id: Long? = null
     var name: String = ""

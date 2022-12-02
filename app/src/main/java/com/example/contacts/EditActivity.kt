@@ -18,12 +18,8 @@ class EditActivity : AppCompatActivity() {
     lateinit var CancelButton: Button
     lateinit var SaveButton: Button
 
-    companion object {
-        const val EDIT = "EDIT"
-    }
-
     private val dao by lazy {
-        TodoDatabase.getDatabase(this).todoDao()
+        ContDb.getDatabase(this).todoDao()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,8 +28,8 @@ class EditActivity : AppCompatActivity() {
 
         NameText = findViewById(R.id.NameEdit)
         LastText = findViewById(R.id.LastNameEdit)
-//        DateText = findViewById(R.id.InfoDateBorn)
-//        NumberText = findViewById(R.id.)
+        DateText = findViewById(R.id.editTextDate)
+        NumberText = findViewById(R.id.editNumber)
 
         CancelButton = findViewById(R.id.Cancelbutton)
         SaveButton = findViewById(R.id.Savebutton)
@@ -43,19 +39,19 @@ class EditActivity : AppCompatActivity() {
 
         NameText.setText(entity.name)
         LastText.setText(entity.lastName)
-//        DateText.setText(itemTextDate)
-//        NumberText.setText(itemTextNumber)
-
+        DateText.setText(entity.dateOfBirth)
+        NumberText.setText(entity.number)
 
         CancelButton.setOnClickListener {
             finish()
         }
 
         SaveButton.setOnClickListener {
-            println(entity)
             entity.name = NameText.text.toString()
             entity.lastName = LastText.text.toString()
-            println(entity)
+            entity.number = NumberText.text.toString()
+            entity.dateOfBirth = DateText.text.toString()
+
             dao.update(entity)
             var intent = Intent(this, MainActivity::class.java)
             intent.putExtra(MainActivity.ITEM_ID_KEY, id)

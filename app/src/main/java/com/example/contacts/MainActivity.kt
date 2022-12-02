@@ -6,28 +6,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var SearchText : EditText
-    lateinit var ButtonSearch : Button
     lateinit var ButtonCreate : Button
 
-    private var ContList = mutableListOf<TodoEntity>()
-    private var hideList = mutableListOf<TodoEntity>()
+    private var ContList = mutableListOf<ContEntity>()
+    private var buffVievList = mutableListOf<ContEntity>()
 
     private lateinit var adapter: RecyclerAdapter
     lateinit var recyclerView : RecyclerView
 
     private val dao by lazy {
-        TodoDatabase.getDatabase(this).todoDao()
+        ContDb.getDatabase(this).todoDao()
     }
 
     companion object {
@@ -41,11 +37,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         SearchText = findViewById(R.id.editTextTextPersonName)
-        ButtonSearch = findViewById(R.id.SearchButton)
         ButtonCreate = findViewById(R.id.Add)
-        recyclerView = findViewById<RecyclerView>(R.id.ViewOfContacts)
 
-        changeList()
+        recyclerView = findViewById(R.id.ViewOfContacts)
+
+        UpdateAdapter()
 
         ButtonCreate.setOnClickListener{
             var add_id = AddToCont("None","None", "None", "None")
@@ -57,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         SearchText.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {
-                filter(SearchText.text.toString())
+                SortList(SearchText.text.toString())
             }
 
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -65,41 +61,38 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun filter(text: String){
+    private fun SortList(text: String){
         if(text == ""){
-            changeList()
+            UpdateAdapter()
         }else {
-            hideList.clear()
-            hideList.addAll(dao.all)
+            buffVievList.clear()
+            buffVievList.addAll(dao.all)
 
             ContList.clear()
 
-            for (cont in hideList) {
-                if (text in cont.name.toLowerCase()) {
+            for (cont in buffVievList) {
+                if (text.toLowerCase() in (cont.name.toLowerCase() + " " +cont.lastName.toLowerCase())) {
                     if(!ContList.contains(cont)) {
                         ContList.add(cont)
                     }
                 }
             }
-            changeListFiltered(ContList)
-        }
-    }
 
-    fun changeListFiltered(filters: MutableList<TodoEntity>){
-        adapter = RecyclerAdapter(filters) {
-            if(it != -1) {
-                val intent = Intent(this, InfoContactActivity::class.java)
-                intent.putExtra(ITEM_ID_KEY, ContList[it].id)
-                startActivityForResult(intent, REQUEST_CODE_INFO)
+            adapter = RecyclerAdapter(ContList) {
+                if(it != -1) {
+                    val intent = Intent(this, InfoContactActivity::class.java)
+                    intent.putExtra(ITEM_ID_KEY, ContList[it].id)
+                    startActivityForResult(intent, REQUEST_CODE_INFO)
+                }
             }
 
+            adapter.notifyItemInserted(ContList.lastIndex)
+            recyclerView.layoutManager = LinearLayoutManager(this)
+            recyclerView.adapter = adapter
         }
-        adapter.notifyItemInserted(filters.lastIndex)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
     }
 
-    fun changeList(){
+    private fun UpdateAdapter(){
         ContList.clear()
         ContList.addAll(dao.all)
 
@@ -118,19 +111,19 @@ class MainActivity : AppCompatActivity() {
 
 
     fun AddToCont(name : String, lastName : String, dateBorn : String, number : String) : Long{
-        val todoEntity = TodoEntity()
+        val contEntity = ContEntity()
 
-        todoEntity.name = name
-        todoEntity.lastName = lastName
-        todoEntity.dateOfBirth = dateBorn
-        todoEntity.number = number
+        contEntity.name = name
+        contEntity.lastName = lastName
+        contEntity.dateOfBirth = dateBorn
+        contEntity.number = number
 
-        todoEntity.id = dao.insert(todoEntity)
+        contEntity.id = dao.insert(contEntity)
 
-        ContList.add(todoEntity)
+        ContList.add(contEntity)
         adapter.notifyItemInserted(ContList.lastIndex)
 
-        return todoEntity.id!!
+        return contEntity.id!!
     }
 
     override fun onActivityResult(requestCode: Int, resultCode : Int, data: Intent?) {
@@ -138,26 +131,33 @@ class MainActivity : AppCompatActivity() {
 
         if (resultCode == Activity.RESULT_OK) {
 
-            val id = data!!.getIntExtra(ITEM_ID_KEY, 0)
+            val id = data!!.getLongExtra(ITEM_ID_KEY, 0L)
+
+            val cont = dao.getById(id)
+            var it = 0
+
+            for(cont in ContList){
+                ++it
+                if(cont.id == id){
+                    break
+                }
+            }
 
             when (requestCode){
                 REQUEST_CODE_INFO -> {
-                    val isDelete = data!!.getBooleanExtra(InfoContactActivity.DELETE, false)
+                    dao.delete(cont)
+                    ContList.remove(cont)
+                    adapter.notifyItemRemoved(it)
 
-                    if (isDelete) {
-                        dao.delete(ContList[id])
-                        ContList.removeAt(id)
-                        adapter.notifyItemRemoved(id)
-                    }
+                    UpdateAdapter()
                 }
-                REQUEST_CODE_CREATE -> {
-                    val isCancel = data!!.getBooleanExtra(CreateActivity.CANCEL, false)
 
-                    if(isCancel){
-                        dao.delete(ContList[id])
-                        ContList.removeAt(id)
-                        adapter.notifyItemRemoved(id)
-                    }
+                REQUEST_CODE_CREATE -> {
+                    dao.delete(cont)
+                    ContList.remove(cont)
+                    adapter.notifyItemRemoved(it)
+
+                    UpdateAdapter()
                 }
             }
         }
